@@ -1,0 +1,58 @@
+{% extends "../index.njk" %}
+
+{% block experiment_js %}
+    <script src="/uncompressed-src/mozilla-cookie-helper.js"></script>
+    <script src="/uncompressed-src/mozilla-traffic-cop.js"></script>
+    <script src="/experiment-page1.js"></script>
+{% endblock %}
+
+{% block page_header %}
+    <h2>Aquatic Life</h2>
+{% endblock %}
+
+{% block content %}
+    <!-- data-experiment-id is only used for debug purposes -->
+    <div id="content" data-experiment-id="experiment-page-1">
+        <article>
+            <figure>
+            {% if not variation %}
+                <span>🐠</span>
+                <figcaption class="little-text">
+                    tropical fish
+                </figcaption>
+            {% elif variation == '1' %}
+                <span>🐡</span>
+                <figcaption class="little-text">
+                    blowfish
+                </figcaption>
+            {% elif variation == '2' %}
+                <span>🐳</span>
+                <figcaption class="little-text">
+                    cute whale
+                </figcaption>
+            {% elif variation == '3' %}
+                <span>🐋</span>
+                <figcaption class="little-text">
+                    humpback whale
+                </figcaption>
+            {% endif %}
+            </figure>
+            <p>
+                The first thing that goes through a captain's head when he hears
+                there's low morale goin' around is: "What'd I do? Is it all my
+                fault? "Well, he's probably right. Most of us have been together
+                a long time. There are others that were here before that. Do you
+                all not like me anymore? I mean, what am I supposed to do? I
+                don't know. Look, if you're not against me&hellip;don't cross
+                this line. If yes, do. I love you all.
+            </p>
+        </article>
+
+
+        {% include "./_experiment-details.njk" %}
+    </div>
+{% endblock %}
+
+{% block page_js %}
+    <script src="/experiment-details.js"></script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "../index.njk" %}
+
+{% block experiment_js %}
+    <script src="/uncompressed-src/mozilla-cookie-helper.js"></script>
+    <script src="/uncompressed-src/mozilla-traffic-cop.js"></script>
+    <script src="/experiment-page2.js"></script>
+{% endblock %}
+
+{% block page_header %}
+    <h2>Extra Curricular</h2>
+{% endblock %}
+
+{% block content %}
+    <div id="content" data-experiment-id="experiment-page-2">
+        <article>
+            <figure>
+            {% if not variation %}
+                <span>🐝</span>
+                <figcaption class="little-text">
+                    bee keeping
+                </figcaption>
+            {% elif variation == 'a' %}
+                <span>🔭</span>
+                <figcaption class="little-text">
+                    astronomy
+                </figcaption>
+            {% elif variation == 'b' %}
+                <span>🥋</span>
+                <figcaption class="little-text">
+                    kung fu
+                </figcaption>
+            {% endif %}
+            </figure>
+            <p>
+                You guys have it real easy. I never had it like this where I
+                grew up. But I send my kids here because the fact is you go to
+                one of the best schools in the country: Rushmore. Now, for some
+                of you it doesn't matter. You were born rich and you're going to
+                stay rich. But here's my advice to the rest of you: Take dead
+                aim on the rich boys. Get them in the crosshairs and take them
+                down. Just remember, they can buy anything but they can't buy
+                backbone. Don't let them forget it. Thank you.
+            </p>
+        </article>
+    </div>
+
+    {% include "./_experiment-details.njk" %}
+{% endblock %}
+
+{% block page_js %}
+    <script src="/experiment-details.js"></script>
+{% endblock %}

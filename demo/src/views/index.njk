@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1, width=device-width">
+    <title>Traffic Cop Demo</title>
+    <link rel="stylesheet" href="/normalize.css">
+    <link rel="stylesheet" href="/demo.css">
+
+    {% block experiment_js %}{% endblock %}
+</head>
+<body>
+
+<header class="content">
+    <h1><a href="/">Traffic Cop Demo</a></h1>
+</header>
+
+<nav class="content">
+    <ul>
+        <li><a href="/page/1" class="little-text">aquatic life</a></li>
+        <li><a href="/page/2" class="little-text">extra curricular</a></li>
+    </ul>
+</nav>
+
+<div class="content">
+{% block page_header %}
+    <h2>Using this demo</h2>
+{% endblock %}
+
+{% block content %}
+    <p>
+        Navigate to one of the pages listed above. You will be either chosen for
+        an experiment or placed in the "no variation" group. Repeated visits to
+        that same page will result in the same variation (or lack thereof) being
+        shown.
+    </p>
+
+    <p>
+        Debug information will be shown at the bottom of the page. To clear the
+        variation, click the button in the debug area. This will remove the
+        cookie for that page and take you back to the home page.
+    </p>
+
+    <p>
+        <strong>
+            Note that you may be selected for the same variation after clearing
+            the cookie. Give each page multiple visits and clears to see all
+            available variations.
+        </strong>
+    </p>
+{% endblock %}
+</div>
+
+{% block page_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,127 @@
+body {
+    margin-bottom: 3em;
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+    width: 700px;
+}
+
+p {
+    line-height: 1.4;
+    margin-bottom: 2em;
+}
+
+h1 {
+    margin: 0;
+    padding: 40px 0;
+    text-align: center;
+}
+
+h1 a {
+    color: #F21B71;
+    text-decoration: none;
+}
+
+h2 {
+    border-bottom: 4px solid #F5B0CC;
+}
+
+nav {
+    background: #616991;
+    margin-bottom: 4em;
+}
+
+nav ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+nav li {
+    flex: 0 0 50%;
+    list-style: none;
+    padding: 0;
+    text-align: center;
+    width: 50%;
+}
+
+nav a {
+    color: #fff;
+    display: block;
+    padding: 20px 0;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+nav a:hover {
+    background: #F21B71;
+    color: #fff;
+}
+
+article {
+    display: flex;
+    flex-wrap: nowrap;
+    margin: 2em 0;
+}
+
+article figure {
+    flex: 1 1 auto;
+    text-align: center;
+}
+
+article p {
+    flex: 1 1 auto;
+}
+
+figure span {
+    font-size: 120px;
+}
+
+figcaption {
+    background: #F5B0CC;
+}
+
+.little-text {
+    font-size: 16px;
+    font-variant: small-caps;
+    font-weight: bold;
+    letter-spacing: 0.2em;
+}
+
+#experiment-details {
+    background: #D2D9DA;
+    color: #444;
+    display: flex;
+    padding: 5px 20px;
+}
+
+pre {
+    font-size: 14px;
+}
+
+#clear-variation-button {
+    background: #616991;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    flex: 0 0 auto;
+    padding: 5px 20px;
+    transition: background-color 0.2s ease;
+}
+
+#clear-variation-button:hover {
+    background: #F21B71;
+}
+
+#variation-display {
+    flex: 1 1 auto;
+}
+
+#clear-variation {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+}
