@@ -7,6 +7,7 @@
     "tests": "./tests"
   },
   "scripts": {
+    "pretest": "./node_modules/eslint/bin/eslint.js src/* demo/src/* tests/*.js",
     "test": "./node_modules/karma/bin/karma start tests/karma.conf.js"
   },
   "repository": {
@@ -16,6 +17,7 @@
   "author": "MozMEAO",
   "license": "MPL-2.0",
   "devDependencies": {
+    "eslint": "^3.16.1",
     "jasmine-core": "^2.5.2",
     "karma": "^1.5.0",
     "karma-coverage": "^1.1.1",

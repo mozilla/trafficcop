@@ -21,12 +21,14 @@ nunjucks.configure('src/views', {
 
 app.get('/', (req, res) => {
     res.render('index.njk');
-})
+});
 
 app.get('/page/:pageId', pages.route);
 
 app.listen(app.get('port'), () => {
+    /* eslint-disable no-console */
     console.log(`Express server listening on port ${app.get('port')}...`);
+    /* eslint-enable no-console */
 });
 
 module.exports = app;
