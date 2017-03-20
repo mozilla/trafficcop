@@ -49,3 +49,11 @@ wiggum.init();
 In the above example, a visitor would have a 20% chance of being chosen for `v=1`, and a 30% chance for `v=2`. If the visitor is selected for a variation, a cookie with the key `experiment-promo-fall-2017` will be set to store the chosen variation, and the user redirected to the current URL with either `?v=2` or `?v=3` appended.
 
 Check out [the docs](./documentation.md) for more complete technical/implementation information.
+
+## License
+
+This Source Code Form is subject to the terms of the [Mozilla Public
+License, v. 2.0.](http://mozilla.org/MPL/2.0/)
+
+
+
