@@ -3,6 +3,7 @@
 
     var eddie = new Mozilla.TrafficCop({
         id: 'experiment-page-1',
+        cookieExpires: 0, // session length cookie
         variations: {
             'v=1': 50,
             'v=2': 20,
