@@ -13,8 +13,12 @@ describe('mozilla-traffic-cop.js', function () {
         window.Mozilla.Cookies = sinon.stub();
         window.Mozilla.Cookies.enabled = sinon.stub().returns(true);
         window.Mozilla.Cookies.setItem = sinon.stub().returns(true);
+        window.Mozilla.Cookies.removeItem = sinon.stub().returns(true);
         window.Mozilla.Cookies.getItem = sinon.stub().returns(false);
         window.Mozilla.Cookies.hasItem = sinon.stub().returns(false);
+
+        // actual redirect shouldn't happen in tests
+        Mozilla.TrafficCop.performRedirect = sinon.stub();
     });
 
     describe('Mozilla.TrafficCop.init', function() {
@@ -27,7 +31,7 @@ describe('mozilla-traffic-cop.js', function () {
         });
 
         beforeEach(function() {
-            spyOn(cop, 'verifyConfig');
+            spyOn(cop, 'verifyConfig').and.returnValue(true);
         });
 
         it('should not initialize is user has DNT enabled', function() {
@@ -54,6 +58,29 @@ describe('mozilla-traffic-cop.js', function () {
             spyOn(window.Mozilla.Cookies, 'enabled').and.returnValue(false);
             cop.init();
             expect(cop.verifyConfig).not.toHaveBeenCalled();
+        });
+
+        it('should call setReferrerCookie by default', function() {
+            spyOn(cop, 'isVariation').and.returnValue(false);
+            spyOn(cop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
+            spyOn(Mozilla.TrafficCop, 'setReferrerCookie').and.returnValue(true);
+
+            cop.init();
+
+            expect(Mozilla.TrafficCop.setReferrerCookie).toHaveBeenCalled();
+        });
+
+
+        it('should not call setReferrerCookie when specified in config', function() {
+            cop.storeReferrerCookie = false;
+
+            spyOn(cop, 'isVariation').and.returnValue(false);
+            spyOn(cop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
+            spyOn(Mozilla.TrafficCop, 'setReferrerCookie').and.returnValue(true);
+
+            cop.init();
+
+            expect(Mozilla.TrafficCop.setReferrerCookie).not.toHaveBeenCalled();
         });
     });
 
@@ -302,6 +329,35 @@ describe('mozilla-traffic-cop.js', function () {
             spyOn(Mozilla.Cookies, 'getItem').and.returnValue('novariation');
 
             expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('novariation');
+        });
+    });
+
+    describe('Mozilla.TrafficCop.setReferrerCookie', function() {
+        it('should set referrer cookie to `default` if no document.referer exists', function() {
+            spyOn(Mozilla.Cookies, 'setItem').and.returnValue(true);
+            Mozilla.TrafficCop.setReferrerCookie(new Date(), false);
+            expect(Mozilla.Cookies.setItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName, 'direct', jasmine.any(Date));
+        });
+
+        it('should set referrer cookie to the value of `document.referrer` if exists', function() {
+            spyOn(Mozilla.Cookies, 'setItem').and.returnValue(true);
+            Mozilla.TrafficCop.setReferrerCookie(new Date(), 'http://www.google.com');
+            expect(Mozilla.Cookies.setItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName, 'http://www.google.com', jasmine.any(Date));
+        });
+
+        it('should set referrer cookie to the value of `document.referrer` if exists', function() {
+            spyOn(Mozilla.Cookies, 'setItem').and.returnValue(true);
+            // karma does seem to have a document.referer when running these tests...
+            Mozilla.TrafficCop.setReferrerCookie(new Date());
+            expect(Mozilla.Cookies.setItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName, jasmine.stringMatching(/^http.*/), jasmine.any(Date));
+        });
+    });
+
+    describe('Mozilla.TrafficCop.clearReferrerCookie', function() {
+        it('should remove the referrer cookie', function() {
+            spyOn(Mozilla.Cookies, 'removeItem').and.returnValue(true);
+            Mozilla.TrafficCop.clearReferrerCookie();
+            expect(Mozilla.Cookies.removeItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName);
         });
     });
 });
