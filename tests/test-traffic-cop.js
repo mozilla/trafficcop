@@ -333,9 +333,10 @@ describe('mozilla-traffic-cop.js', function () {
     });
 
     describe('Mozilla.TrafficCop.setReferrerCookie', function() {
-        it('should set referrer cookie to `default` if no document.referer exists', function() {
+        it('should set referrer cookie to `direct` if no document.referer exists', function() {
             spyOn(Mozilla.Cookies, 'setItem').and.returnValue(true);
-            Mozilla.TrafficCop.setReferrerCookie(new Date(), false);
+            spyOn(Mozilla.TrafficCop, 'getDocumentReferrer').and.returnValue('');
+            Mozilla.TrafficCop.setReferrerCookie(new Date());
             expect(Mozilla.Cookies.setItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName, 'direct', jasmine.any(Date));
         });
 
@@ -358,6 +359,12 @@ describe('mozilla-traffic-cop.js', function () {
             spyOn(Mozilla.Cookies, 'removeItem').and.returnValue(true);
             Mozilla.TrafficCop.clearReferrerCookie();
             expect(Mozilla.Cookies.removeItem).toHaveBeenCalledWith(Mozilla.TrafficCop.referrerCookieName);
+        });
+    });
+
+    describe('Mozilla.TrafficCop.getDocumentReferrer', function() {
+        it('should return a non-zero length string for document.referrer', function() {
+            expect(Mozilla.TrafficCop.getDocumentReferrer()).toEqual(jasmine.stringMatching(/^http.*/));
         });
     });
 });

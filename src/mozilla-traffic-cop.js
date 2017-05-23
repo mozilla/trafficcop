@@ -258,13 +258,20 @@ Mozilla.TrafficCop.performRedirect = function(redirectURL) {
 };
 
 Mozilla.TrafficCop.setReferrerCookie = function(expirationDate, referrer) {
-    if (referrer !== false) {
-        referrer = referrer || document.referrer;
-    }
+    // in order of precedence, referrer should be:
+    // 1. custom value passed in via unit test
+    // 2. value of document.referrer
+    // 3. 'direct' string literal
+    referrer = referrer || Mozilla.TrafficCop.getDocumentReferrer() || 'direct';
 
-    Mozilla.Cookies.setItem(Mozilla.TrafficCop.referrerCookieName, referrer || 'direct', expirationDate);
+    Mozilla.Cookies.setItem(Mozilla.TrafficCop.referrerCookieName, referrer, expirationDate);
 };
 
 Mozilla.TrafficCop.clearReferrerCookie = function() {
     Mozilla.Cookies.removeItem(Mozilla.TrafficCop.referrerCookieName);
+};
+
+// wrapper around document.referrer for better unit testing
+Mozilla.TrafficCop.getDocumentReferrer = function() {
+    return document.referrer;
 };
