@@ -7,39 +7,37 @@
 {% endblock %}
 
 {% block page_header %}
-    <h2>Extra Curricular</h2>
+    <h2>Tacos!</h2>
 {% endblock %}
 
 {% block content %}
     <div id="content" data-experiment-id="experiment-page-2">
         <article>
             <figure>
-            {% if not variation %}
-                <span>🐝</span>
+                <span>🌮</span>
                 <figcaption class="little-text">
-                    bee keeping
+                    Yes, tacos are the best.
+                    <em class="hidden" id="var-a">(a) Let's have them for breakfast!</em>
+                    <em class="hidden" id="var-b">(b) Let's have them for lunch!</em>
+                    <em class="hidden" id="var-c">(c) Let's have them for dinner!</em>
                 </figcaption>
-            {% elif variation == 'a' %}
-                <span>🔭</span>
-                <figcaption class="little-text">
-                    astronomy
-                </figcaption>
-            {% elif variation == 'b' %}
-                <span>🥋</span>
-                <figcaption class="little-text">
-                    kung fu
-                </figcaption>
-            {% endif %}
             </figure>
             <p>
-                You guys have it real easy. I never had it like this where I
-                grew up. But I send my kids here because the fact is you go to
-                one of the best schools in the country: Rushmore. Now, for some
-                of you it doesn't matter. You were born rich and you're going to
-                stay rich. But here's my advice to the rest of you: Take dead
-                aim on the rich boys. Get them in the crosshairs and take them
-                down. Just remember, they can buy anything but they can't buy
-                backbone. Don't let them forget it. Thank you.
+                What are you gonna spend your money on, kids?
+                <br><br>
+                There’s a special on tacos down at the Taco Mat &mdash; hundred
+                tacos for $100 &mdash; I’m gonna get that.
+                <br><br>
+                I’m gonna contribute my money to the Corporation for Public
+                Broadcasting.
+                <br><br>
+                Tacos? Public broadcasting? I won’t have you kids throwing away
+                your money like that. You’re both coming downtown with me, and
+                you’re gonna put that money in the bank.
+                <br><br>
+                Boy, I sure could go for 100 tacos right about now.
+                <br><br>
+                No.
             </p>
         </article>
     </div>

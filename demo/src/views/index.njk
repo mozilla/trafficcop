@@ -18,8 +18,9 @@
 
 <nav class="content">
     <ul>
-        <li><a href="/page/1" class="little-text">aquatic life</a></li>
-        <li><a href="/page/2" class="little-text">extra curricular</a></li>
+        <li><a href="/page/1" class="little-text">Page 1<span>redirect</span></a></li>
+        <li><a href="/page/2" class="little-text">Page 2<span>callback</span></a></li>
+        <li><a href="/page/3" class="little-text">Page 3<span>redirect + callback</span></a></li>
     </ul>
 </nav>
 
@@ -29,11 +30,12 @@
 {% endblock %}
 
 {% block content %}
+    <h3>All pages</h3>
+
     <p>
-        Navigate to one of the pages listed above. You will be either chosen for
-        an experiment or placed in the "no variation" group. Repeated visits to
-        that same page will result in the same variation (or lack thereof) being
-        shown.
+        You will be either chosen for an experiment or placed in the
+        "no variation" group. Repeated visits to that same page will result in
+        the same variation (or lack thereof) being shown.
     </p>
 
     <p>
@@ -48,6 +50,27 @@
             the cookie. Give each page multiple visits and clears to see all
             available variations.
         </strong>
+    </p>
+
+    <h3>Page 1</h3>
+
+    <p>
+        Upon being chosen for a variation, you will be redirected to the same
+        URL, with the variation appended to the query string.
+    </p>
+
+    <h3>Page 2</h3>
+
+    <p>
+        Upon being chosen for a variation, a custom callback function will be
+        executed in place of a redirect.
+    </p>
+
+    <h3>Page 3</h3>
+
+    <p>
+        A combination of page 1 & page 2. A redirect variation <em>may</em> take
+        place, followed by a custom callback function.
     </p>
 {% endblock %}
 </div>
