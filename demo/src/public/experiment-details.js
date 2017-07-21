@@ -19,6 +19,11 @@
             // remove the cookie for this experiment
             Mozilla.Cookies.removeItem(pageExperimentId);
 
+            // hack for page 3 (which has two experiments)
+            if (pageExperimentId === 'experiment-page-3') {
+                Mozilla.Cookies.removeItem('experiment-page-3-customcallback');
+            }
+
             // redirect back to the home page
             window.location = '/';
         });

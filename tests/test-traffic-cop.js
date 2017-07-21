@@ -5,7 +5,7 @@
 
 /* global describe, beforeEach, afterEach, it, expect, sinon */
 
-describe('mozilla-traffic-cop.js', function () {
+describe('mozilla-traffic-cop.js', function() {
     'use strict';
 
     beforeEach(function() {
@@ -19,6 +19,77 @@ describe('mozilla-traffic-cop.js', function () {
 
         // actual redirect shouldn't happen in tests
         Mozilla.TrafficCop.performRedirect = sinon.stub();
+    });
+
+    describe('Mozilla.TrafficCop instantiation defaults', function() {
+        it('should store supplied config', function() {
+            var config = {
+                id: 'testABC'
+            };
+            var cop = new Mozilla.TrafficCop(config);
+            expect(cop.config).toEqual(config);
+        });
+
+        it('should default to an empty object if supplied config is not an object', function() {
+            var config = 'purplemonkeydishwasher';
+            var cop = new Mozilla.TrafficCop(config);
+            expect(cop.config).toEqual({});
+        });
+
+        it('should store supplied customCallback', function() {
+            var funkyFunc = sinon.stub();
+            var cop = new Mozilla.TrafficCop({
+                customCallback: funkyFunc
+            });
+            expect(cop.customCallback).toEqual(funkyFunc);
+        });
+
+        it('should default customCallback to null if not supplied', function() {
+            var cop = new Mozilla.TrafficCop();
+            expect(cop.customCallback).toEqual(null);
+        });
+
+        it('should set customCallback to null if not supplied with a function', function() {
+            var cop = new Mozilla.TrafficCop({
+                customCallback: 'frinkahedron'
+            });
+            expect(cop.customCallback).toEqual(null);
+        });
+
+        it('should store cookieExpires if specified', function() {
+            var cop = new Mozilla.TrafficCop({
+                cookieExpires: 48
+            });
+            expect(cop.cookieExpires).toEqual(48);
+        });
+
+        it('should default cookieExpires to 24 if not specified', function() {
+            var cop = new Mozilla.TrafficCop();
+            expect(cop.cookieExpires).toEqual(Mozilla.TrafficCop.defaultCookieExpires);
+        });
+
+        it('should store storeReferrerCookie if specified', function() {
+            var cop = new Mozilla.TrafficCop({
+                storeReferrerCookie: false
+            });
+            expect(cop.storeReferrerCookie).toEqual(false);
+        });
+
+        it('should default storeReferrerCookie to true if not specified', function() {
+            var cop = new Mozilla.TrafficCop();
+            expect(cop.storeReferrerCookie).toEqual(true);
+        });
+
+        it('should calculate totalPercentage based off supplied variations', function() {
+            var cop = new Mozilla.TrafficCop({
+                variations: {
+                    'v=1': 25,
+                    'v=2': 15,
+                    'v=3': 5
+                }
+            });
+            expect(cop.totalPercentage).toEqual(45);
+        });
     });
 
     describe('Mozilla.TrafficCop.init', function() {
@@ -59,10 +130,20 @@ describe('mozilla-traffic-cop.js', function () {
             cop.init();
             expect(cop.verifyConfig).not.toHaveBeenCalled();
         });
+    });
+
+    describe('Mozilla.TrafficCop.init redirect', function() {
+        var cop = new Mozilla.TrafficCop({
+            id: 'test123',
+            variations: {
+                'v=1': 20,
+                'v=2': 40
+            }
+        });
 
         it('should call setReferrerCookie by default', function() {
-            spyOn(cop, 'isVariation').and.returnValue(false);
-            spyOn(cop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
+            spyOn(Mozilla.TrafficCop, 'isRedirectVariation').and.returnValue(false);
+            spyOn(Mozilla.TrafficCop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
             spyOn(Mozilla.TrafficCop, 'setReferrerCookie').and.returnValue(true);
 
             cop.init();
@@ -70,17 +151,55 @@ describe('mozilla-traffic-cop.js', function () {
             expect(Mozilla.TrafficCop.setReferrerCookie).toHaveBeenCalled();
         });
 
-
         it('should not call setReferrerCookie when specified in config', function() {
             cop.storeReferrerCookie = false;
 
-            spyOn(cop, 'isVariation').and.returnValue(false);
-            spyOn(cop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
+            spyOn(Mozilla.TrafficCop, 'isRedirectVariation').and.returnValue(false);
+            spyOn(Mozilla.TrafficCop, 'generateRedirectUrl').and.returnValue('http://www.mozilla.com/en-US/?v=1');
             spyOn(Mozilla.TrafficCop, 'setReferrerCookie').and.returnValue(true);
 
             cop.init();
 
             expect(Mozilla.TrafficCop.setReferrerCookie).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('Mozilla.TrafficCop.init customCallback', function() {
+        it('should call customCallback when specified', function() {
+            var cop = new Mozilla.TrafficCop({
+                id: 'test123',
+                customCallback: sinon.stub(),
+                variations: {
+                    'a': 30,
+                    'b': 30
+                }
+            });
+
+            spyOn(Mozilla.TrafficCop, 'chooseVariation').and.returnValue('a');
+            spyOn(cop, 'customCallback');
+
+            cop.init();
+
+            expect(cop.customCallback).toHaveBeenCalledWith('a');
+        });
+
+        it('should not attempt a redirect if customCallback is specified', function() {
+            var cop = new Mozilla.TrafficCop({
+                id: 'test123',
+                customCallback: sinon.stub(),
+                variations: {
+                    'a': 30,
+                    'b': 30
+                }
+            });
+
+            spyOn(Mozilla.TrafficCop, 'generateRedirectUrl');
+            spyOn(Mozilla.TrafficCop, 'performRedirect');
+
+            cop.init();
+
+            expect(Mozilla.TrafficCop.generateRedirectUrl).not.toHaveBeenCalled();
+            expect(Mozilla.TrafficCop.performRedirect).not.toHaveBeenCalled();
         });
     });
 
@@ -186,7 +305,7 @@ describe('mozilla-traffic-cop.js', function () {
         });
     });
 
-    describe('Mozilla.TrafficCop.cookieExpiresDate', function() {
+    describe('Mozilla.TrafficCop.generateCookieExpiresDate', function() {
         var config = {
             id: 'test123',
             variations: {
@@ -196,52 +315,46 @@ describe('mozilla-traffic-cop.js', function () {
         };
 
         it('should return a date 24 hours into the future when no hours are specified', function() {
+            // a cop with no
             var cop = new Mozilla.TrafficCop(config);
-            var expiry = cop.cookieExpiresDate(new Date(2017, 0, 1, 12, 30));
+            var expiry = Mozilla.TrafficCop.generateCookieExpiresDate(cop.cookieExpires, new Date(2017, 0, 1, 12, 30));
             expect(expiry.getFullYear()).toBe(2017);
             expect(expiry.getMonth()).toBe(0);
             expect(expiry.getDate()).toBe(2); // 24 hours default cookie length
         });
 
         it('should return an appropriate future date when hours are specified', function() {
-            config.cookieExpires = 72;
-            var cop = new Mozilla.TrafficCop(config);
-            var expiry = cop.cookieExpiresDate(new Date(2017, 0, 1, 12, 30));
+            var expiry = Mozilla.TrafficCop.generateCookieExpiresDate(72, new Date(2017, 0, 1, 12, 30));
             expect(expiry.getFullYear()).toBe(2017);
             expect(expiry.getMonth()).toBe(0);
             expect(expiry.getDate()).toBe(4); // 72 hours = 3 days
         });
 
         it('should return null when 0 hours are specified', function() {
-            config.cookieExpires = 0;
-            var cop = new Mozilla.TrafficCop(config);
-            expect(cop.cookieExpiresDate()).toBe(null);
+            expect(Mozilla.TrafficCop.generateCookieExpiresDate(0)).toBe(null);
         });
     });
 
-    describe('Mozilla.TrafficCop.isVariation', function() {
-        var cop = new Mozilla.TrafficCop({
-            id: 'test123',
-            variations: {
-                'v=1': 40,
-                'v=2': 30
-            }
-        });
+    describe('Mozilla.TrafficCop.isRedirectVariation', function() {
+        var variations = {
+            'v=1': 40,
+            'v=2': 30
+        };
 
         it('should return false if the current queryString does not contain a variation', function() {
-            expect(cop.isVariation('?v=3')).toBeFalsy();
-            expect(cop.isVariation('?fav=1')).toBeFalsy();
-            expect(cop.isVariation('?v=3&fav=1')).toBeFalsy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?v=3')).toBeFalsy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?fav=1')).toBeFalsy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?v=3&fav=1')).toBeFalsy();
         });
 
         it('should return true if the current querystring contains a variation', function() {
-            expect(cop.isVariation('?v=2')).toBeTruthy();
-            expect(cop.isVariation('?foo=bar&v=2')).toBeTruthy();
-            expect(cop.isVariation('?v=2&foo=bar')).toBeTruthy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?v=2')).toBeTruthy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?foo=bar&v=2')).toBeTruthy();
+            expect(Mozilla.TrafficCop.isRedirectVariation(variations, '?v=2&foo=bar')).toBeTruthy();
         });
     });
 
-    describe('Mozilla.TrafficCop.generateRedirectUrl', function() {
+    describe('Mozilla.TrafficCop.chooseVariation', function() {
         var cop = new Mozilla.TrafficCop({
             id: 'test123',
             variations: {
@@ -251,69 +364,53 @@ describe('mozilla-traffic-cop.js', function () {
             }
         });
 
-        it('should not generate redirect if random number is greater than total percentages', function() {
+        it('should return noVariationCookieValue if random number is greater than total percentages', function() {
             // random number >= 80 is greater than percentage total above (75)
             spyOn(window.Math, 'random').and.returnValue(0.8);
-
-            expect(cop.generateRedirectUrl()).toBeFalsy();
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual(Mozilla.TrafficCop.noVariationCookieValue);
         });
 
-        it('should generate a redirect to the first variation when random number is at the start of the range', function() {
+        it('should choose the first variation when random number is at the start of the range', function() {
             // first variation is 30%, so 1-30
             spyOn(window.Math, 'random').and.returnValue(0.01);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=3');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=3');
         });
 
-        it('should generate a redirect to the first variation when random number is at the end of the range', function() {
+        it('should choose the first variation when random number is at the end of the range', function() {
             // first variation is 30%, so 1-30
             spyOn(window.Math, 'random').and.returnValue(0.29);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=3');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=3');
         });
 
-        it('should generate a redirect to the second variation when random number is at the start of the range', function() {
+        it('should choose the second variation when random number is at the start of the range', function() {
             // second variation is 20%, so 31-50
             spyOn(window.Math, 'random').and.returnValue(0.3);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=1');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=1');
         });
 
-        it('should generate a redirect to the second variation when random number is at the end of the range', function() {
+        it('should choose the second variation when random number is at the end of the range', function() {
             // second variation is 20%, so 31-50
             spyOn(window.Math, 'random').and.returnValue(0.49);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=1');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=1');
         });
 
-        it('should generate a redirect to the first variation when random number is at the start of the range', function() {
+        it('should choose to the third variation when random number is at the start of the range', function() {
             // third variation is 25%, so 51-75
             spyOn(window.Math, 'random').and.returnValue(0.5);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=2');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
         });
 
-        it('should generate a redirect to the first variation when random number is at the end of the range', function() {
+        it('should the third variation when random number is at the end of the range', function() {
             // third variation is 25%, so 51-75
             spyOn(window.Math, 'random').and.returnValue(0.74);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=2');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
         });
 
-        it('should generate a redirect retaining the original querystring when present', function() {
-            spyOn(window.Math, 'random').and.returnValue(0.74);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org?foo=bar')).toEqual('https://www.mozilla.org?foo=bar&v=2');
-        });
-
-        it('should generate a redirect retaining the original hash when present', function() {
-            spyOn(window.Math, 'random').and.returnValue(0.74);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org#hash')).toEqual('https://www.mozilla.org?v=2#hash');
-        });
-
-        it('should generate a redirect retaining the original querystring and hash when present', function() {
-            spyOn(window.Math, 'random').and.returnValue(0.74);
-            expect(cop.generateRedirectUrl('https://www.mozilla.org?foo=bar#hash')).toEqual('https://www.mozilla.org?foo=bar&v=2#hash');
-        });
-
-        it('should use a valid variation stored in a cookie', function() {
+        it('should choose a valid variation stored in a cookie', function() {
             spyOn(Mozilla.Cookies, 'hasItem').and.returnValue(true);
             spyOn(Mozilla.Cookies, 'getItem').and.returnValue('v=2');
 
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=2');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
         });
 
         it('should pick a new variation if variation stored in cookie is invalid', function() {
@@ -321,14 +418,32 @@ describe('mozilla-traffic-cop.js', function () {
             spyOn(Mozilla.Cookies, 'getItem').and.returnValue('v=5');
             spyOn(window.Math, 'random').and.returnValue(0.74);
 
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('https://www.mozilla.org?v=2');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
         });
 
-        it('should not choose a variation if user was placed into a no-variation cohort', function() {
+        it('should choose noVariationCookieValue if user was placed into a no-variation cohort', function() {
             spyOn(Mozilla.Cookies, 'hasItem').and.returnValue(true);
-            spyOn(Mozilla.Cookies, 'getItem').and.returnValue('novariation');
+            spyOn(Mozilla.Cookies, 'getItem').and.returnValue(Mozilla.TrafficCop.noVariationCookieValue);
 
-            expect(cop.generateRedirectUrl('https://www.mozilla.org')).toEqual('novariation');
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual(Mozilla.TrafficCop.noVariationCookieValue);
+        });
+    });
+
+    describe('Mozilla.TrafficCop.generateRedirectUrl', function() {
+        it('should generate a redirect retaining the original querystring when present', function() {
+            expect(Mozilla.TrafficCop.generateRedirectUrl('v=2', 'https://www.mozilla.org?foo=bar')).toEqual('https://www.mozilla.org?foo=bar&v=2');
+        });
+
+        it('should generate a redirect retaining the original hash when present', function() {
+            expect(Mozilla.TrafficCop.generateRedirectUrl('v=2', 'https://www.mozilla.org#hash')).toEqual('https://www.mozilla.org?v=2#hash');
+        });
+
+        it('should generate a redirect retaining the original querystring and hash when present', function() {
+            expect(Mozilla.TrafficCop.generateRedirectUrl('v=2', 'https://www.mozilla.org?foo=bar#hash')).toEqual('https://www.mozilla.org?foo=bar&v=2#hash');
+        });
+
+        it('should not generate a redirect if no variation was chosen', function() {
+            expect(Mozilla.TrafficCop.generateRedirectUrl(Mozilla.TrafficCop.noVariationCookieValue)).toBeFalsy();
         });
     });
 
