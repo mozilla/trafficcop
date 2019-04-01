@@ -90,6 +90,30 @@ describe('mozilla-traffic-cop.js', function() {
             });
             expect(cop.totalPercentage).toEqual(45);
         });
+
+        it('should handle variation percentages in the tenths', function () {
+            var cop = new Mozilla.TrafficCop({
+                variations: {
+                    'v=1': 10.4,
+                    'v=2': 0.2,
+                    'v=3': 7,
+                    'v=4': 0.1
+                }
+            });
+            expect(cop.totalPercentage).toEqual(17.7);
+        });
+
+        it('should handle variation percentages in the hundredths', function () {
+            var cop = new Mozilla.TrafficCop({
+                variations: {
+                    'v=1': 9.04,
+                    'v=2': 10.25,
+                    'v=3': 27.3,
+                    'v=4': 0.1
+                }
+            });
+            expect(cop.totalPercentage).toEqual(46.69);
+        });
     });
 
     describe('Mozilla.TrafficCop.init', function() {
@@ -360,13 +384,15 @@ describe('mozilla-traffic-cop.js', function() {
             variations: {
                 'v=3': 30,
                 'v=1': 20,
-                'v=2': 25
+                'v=2': 25.25,
+                'v=4': 0.2,
+                'v=5': 0.1
             }
         });
 
         it('should return noVariationCookieValue if random number is greater than total percentages', function() {
-            // random number >= 80 is greater than percentage total above (75)
-            spyOn(window.Math, 'random').and.returnValue(0.8);
+            // random number >= 80 is greater than percentage total above (75.55)
+            spyOn(window.Math, 'random').and.returnValue(0.7556);
             expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual(Mozilla.TrafficCop.noVariationCookieValue);
         });
 
@@ -395,15 +421,33 @@ describe('mozilla-traffic-cop.js', function() {
         });
 
         it('should choose to the third variation when random number is at the start of the range', function() {
-            // third variation is 25%, so 51-75
+            // third variation is 25.25%, so 51-75.25
             spyOn(window.Math, 'random').and.returnValue(0.5);
             expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
         });
 
-        it('should the third variation when random number is at the end of the range', function() {
-            // third variation is 25%, so 51-75
-            spyOn(window.Math, 'random').and.returnValue(0.74);
+        it('should choose the third variation when random number is at the end of the range', function() {
+            // third variation is 25.25%, so 51-75.25
+            spyOn(window.Math, 'random').and.returnValue(0.7525);
             expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');
+        });
+
+        it('should choose the fourth variation when random number is at the start of the range', function () {
+            // fourth variation is 0.2%, so 75.26-75.45
+            spyOn(window.Math, 'random').and.returnValue(0.7526);
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=4');
+        });
+
+        it('should choose the fourth variation when random number is at the end of the range', function () {
+            // fourth variation is 0.2%, so 75.26-75.45
+            spyOn(window.Math, 'random').and.returnValue(0.7545);
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=4');
+        });
+
+        it('should choose the fifth variation when random number matches', function () {
+            // fifth variation is 0.1%, so 75.46
+            spyOn(window.Math, 'random').and.returnValue(0.7546);
+            expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=5');
         });
 
         it('should choose a valid variation stored in a cookie', function() {
@@ -415,7 +459,7 @@ describe('mozilla-traffic-cop.js', function() {
 
         it('should pick a new variation if variation stored in cookie is invalid', function() {
             spyOn(Mozilla.Cookies, 'hasItem').and.returnValue(true);
-            spyOn(Mozilla.Cookies, 'getItem').and.returnValue('v=5');
+            spyOn(Mozilla.Cookies, 'getItem').and.returnValue('v=42');
             spyOn(window.Math, 'random').and.returnValue(0.74);
 
             expect(Mozilla.TrafficCop.chooseVariation(cop.id, cop.variations, cop.totalPercentage)).toEqual('v=2');

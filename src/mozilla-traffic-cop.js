@@ -79,9 +79,13 @@ Mozilla.TrafficCop = function(config) {
     // calculate and store total percentage of variations
     for (var v in this.variations) {
         if (this.variations.hasOwnProperty(v) && typeof this.variations[v] === 'number') {
-            this.totalPercentage += this.variations[v];
+            // multiply by 100 to allow for percentages to the hundredth
+            // (and avoid floating point math errors)
+            this.totalPercentage += (this.variations[v] * 100);
         }
     }
+
+    this.totalPercentage = this.totalPercentage / 100;
 
     return this;
 };
@@ -245,8 +249,9 @@ Mozilla.TrafficCop.chooseVariation = function(id, variations, totalPercentage) {
     // no cookie exists, or cookie has invalid variation, so choose a shiny new
     // variation
     } else {
-        // conjure a random number between 1 and 100 (inclusive)
-        rando = Math.floor(Math.random() * 100) + 1;
+        // conjure a random float between 1 and 100 (inclusive)
+        rando = Math.floor(Math.random() * 10000) + 1;
+        rando = rando/100;
 
         // make sure random number falls in the distribution range
         if (rando <= totalPercentage) {
