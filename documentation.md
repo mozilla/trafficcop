@@ -2,6 +2,8 @@
 
 Traffic Cop places visitors into A/B/x cohorts, and either performs a redirect or executes a developer-specified JavaScript function.
 
+**Note that Traffic Cop supports percentages into the hundredths, but no smaller.**
+
 
 ## How it works
 
@@ -30,9 +32,10 @@ var lou = new Mozilla.TrafficCop({
   id: ‘experiment-button-color’,
   customCallback: myCallback,
   variations: {
-    ‘a’: 25,
-    ‘b’: 25,
-    'c': 25
+    ‘a’: 10.25,
+    ‘b’: 20.2,
+    'c': 0.1,
+    'd': 0.55
   }
 });
 
@@ -57,8 +60,9 @@ Any query string parameters present when a user initially lands on a page will b
 var wiggum = new Mozilla.TrafficCop({
   id: ‘experiment-promo-fall-2017’,
   variations: {
-    ‘v=1’: 20,
-    ‘v=2’: 30
+    ‘v=1’: 0.15,
+    ‘v=2’: 30,
+    'v=3': 10.6
   }
 });
 
@@ -85,21 +89,21 @@ Variations are sorted in the order provided, and percentages are tallied to crea
 var rex = new Mozilla.TrafficCop({
     id: 'experiment-new-headline',
     variations: {
-        'v=a': 25,
-        'v=b': 25,
-        'v=c': 25
+        'v=a': 15,
+        'v=b': 0.25,
+        'v=c': 25.6
     }
 });
 ```
 
 The implied tiers would be:
 
-1. `v=a`: 1-25
-2. `v=b`: 26-50
-3. `v=c`: 51-75
-4. (no variation chosen): 76-100
+1. `v=a`: 1-15
+2. `v=b`: 15.01 - 15.25
+3. `v=c`: 15.26 - 40.31
+4. (no variation chosen): 40.32-100
 
-If the random number generated was 44, the user would be redirected to `?v=b`.
+If the random number generated was 12.6, the user would be redirected to `?v=a`. A value of 15.2 would send the user `?v=b`, 15.6 to `?v=c`, and anything above 40.31 would result in no redirect.
 
 
 ## Configuration
@@ -115,9 +119,9 @@ An implementation for a redirect experiment might look like:
 var eddie = new Mozilla.TrafficCop({
     id: 'experiment-new-headline',
     variations: {
-        'v=1': 25,
-        'v=2': 25,
-        'v=3': 25
+        'v=1': 12.2,
+        'v=2': 0.13,
+        'v=3': 11.45
     }
 });
 
@@ -126,7 +130,7 @@ eddie.init();
 
 In the above example, the string *experiment-new-headline* will be used as the cookie name to store the chosen variation.
 
-The test will have 3 variations, each targeting 25% of users. There will also be a 25% chance that `novariation` is chosen.
+The test will have 3 variations and will target a total of 23.78% of visitors. There will also be a 76.22% chance that `novariation` is chosen.
 
 
 ### Optional Configuration

@@ -48,15 +48,17 @@ Implementing Traffic Cop requires at least two other JavaScript files: one to co
 var wiggum = new Mozilla.TrafficCop({
   id: ‘experiment-promo-fall-2017’,
   variations: {
-    ‘v=1’: 20,
-    ‘v=2’: 30
+    ‘v=1’: 10.5,
+    ‘v=2’: 0.25
   }
 });
 
 wiggum.init();
 ```
 
-In the above example, a visitor would have a 20% chance of being chosen for `v=1`, and a 30% chance for `v=2`. If the visitor is selected for a variation, a cookie with the key `experiment-promo-fall-2017` will be set to store the chosen variation, and the user redirected to the current URL with either `?v=1` or `?v=2` appended.
+In the above example, a visitor would have a 10.5% chance of being chosen for `v=1`, and a 0.25% chance for `v=2`. If the visitor is selected for a variation, a cookie with the key `experiment-promo-fall-2017` will be set to store the chosen variation, and the user redirected to the current URL with either `?v=1` or `?v=2` appended.
+
+**Note that Traffic Cop supports percentages into the hundredths, but no smaller.**
 
 ```javascript
 // example configuration for a callback function experiment
