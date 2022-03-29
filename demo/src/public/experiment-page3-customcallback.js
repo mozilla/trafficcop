@@ -1,13 +1,13 @@
-(function() {
+(function () {
     'use strict';
 
     var variants = {
-        'a': 40,
-        'b': 40
+        a: 40,
+        b: 40
     };
 
     function handleVariation(variation) {
-        if (variants.hasOwnProperty(variation)) {
+        if (Object.prototype.hasOwnProperty.call(variants, variation)) {
             var target = document.getElementById('var-' + variation);
             target.classList.remove('hidden');
         }
