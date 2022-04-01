@@ -1,0 +1,19 @@
+name: "CI"
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: "Test"
+    steps:
+      - name: "Ensure a recent Firefox and the xvfb framebuffer are installed"
+        run: |
+          sudo apt-get update
+          sudo apt-get install xvfb firefox
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: "Install NPM deps"
+        run: npm install
+      - name: "Run JS tests in headless mode, thanks to xvfb"
+        run: xvfb-run npm test
