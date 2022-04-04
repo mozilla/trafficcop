@@ -7,7 +7,7 @@
         "tests": "./tests"
     },
     "scripts": {
-        "pretest": "./node_modules/eslint/bin/eslint.js src/* demo/src/**/*.js tests/*.js",
+        "pretest": "npm run prettier && ./node_modules/eslint/bin/eslint.js src/* demo/src/**/*.js tests/*.js",
         "test": "./node_modules/karma/bin/karma start tests/karma.conf.js",
         "prettier": "prettier --write ."
     },

@@ -159,6 +159,10 @@ describe('mozilla-traffic-cop.js', function () {
     });
 
     describe('Mozilla.TrafficCop.init redirect', function () {
+        afterEach(function () {
+            cop.storeReferrerCookie = true;
+        });
+
         var cop = new Mozilla.TrafficCop({
             id: 'test123',
             variations: {
