@@ -24,12 +24,12 @@ h1 {
 }
 
 h1 a {
-    color: #F21B71;
+    color: #f21b71;
     text-decoration: none;
 }
 
 h2 {
-    border-bottom: 4px solid #F5B0CC;
+    border-bottom: 4px solid #f5b0cc;
 }
 
 nav {
@@ -60,7 +60,7 @@ nav a {
 }
 
 nav a:hover {
-    background: #F21B71;
+    background: #f21b71;
     color: #fff;
 }
 
@@ -90,7 +90,7 @@ figure span {
 }
 
 figcaption {
-    background: #F5B0CC;
+    background: #f5b0cc;
 }
 
 .little-text {
@@ -101,7 +101,7 @@ figcaption {
 }
 
 #experiment-details {
-    background: #D2D9DA;
+    background: #d2d9da;
     color: #444;
     display: flex;
     padding: 5px 20px;
@@ -123,7 +123,7 @@ pre {
 }
 
 #clear-variation-button:hover {
-    background: #F21B71;
+    background: #f21b71;
 }
 
 #variation-display {

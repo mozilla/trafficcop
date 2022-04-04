@@ -1,8 +1,8 @@
 # Traffic Cop
+
 ## Simple, lightweight, developer-focused front-end A/B testing
 
 (If you want to skip the spiel and get straight to business, check out the [docs](./documentation.md).)
-
 
 ### What does it do?
 
@@ -11,17 +11,15 @@ Traffic Cop is a small bit of JavaScript that decides if a visitor should partic
 1. a developer-specified JavaScript function is passed the chosen variation and executed
 2. the user is redirected to the current URL with a developer-specified querystring parameter appended
 
-
 ### Example flow
 
 1. Visitor lands on `www.toohot.today/product`
 2. Visitor is chosen for variation 2
 3. Visitor is issued a cookie and then either:
-  a. redirected to `www.toohot.today/product?v=2` *or*
-  b. a developer-specified JavaScript function is passed the value of `2` and executed
+   a. redirected to `www.toohot.today/product?v=2` _or_
+   b. a developer-specified JavaScript function is passed the value of `2` and executed
 
 What happens on `www.toohot.today/product?v=2`, or in the JavaScript function, is completely up to the developer (possibly you, dear reader).
-
 
 ### Why did we build it?
 
@@ -33,7 +31,6 @@ In contrast to third-party options (e.g. [Optimizely](https://www.optimizely.com
 2. **Performance** — Traffic Cop is light and has only one dependency, resulting in less than 2KB of JS when minified. (In our experience, Optimizely's JS bundle was regularly above 200KB.)
 3. **Your workflow** — Traffic Cop offers great flexibility in when and how you write and load variation code. No need to type jQuery in a text box on a third-party web page.
 4. **Savings** — No need to pay for a third-party service.
-
 
 ### How does it work?
 
@@ -84,7 +81,6 @@ lou.init();
 In the above example, a visitor would have a 25% chance of being chosen for `a`, `b`, or `c`. The chosen variation will be passed to the `myCallback` function (which can do whatever it likes).
 
 Check out [the docs](./documentation.md) for more complete information.
-
 
 ## License
 

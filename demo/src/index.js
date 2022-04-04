@@ -11,7 +11,10 @@ app.set('port', 3030);
 
 app.use(favicon(path.join(__dirname, './public/favicon.ico')));
 app.use(express.static(path.join(__dirname, './public')));
-app.use('/uncompressed-src', express.static(path.join(__dirname, '/../../src/')));
+app.use(
+    '/uncompressed-src',
+    express.static(path.join(__dirname, '/../../src/'))
+);
 
 nunjucks.configure('src/views', {
     autoescape: true,
