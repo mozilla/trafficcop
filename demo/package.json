@@ -1,20 +1,20 @@
 {
-  "name": "traffic-cop-demo",
-  "version": "1.0.0",
-  "description": "Express app demonstrating usage of Traffic Cop.",
-  "main": "index.js",
-  "scripts": {
-    "start": "nodemon src/index.js"
-  },
-  "author": "Mozilla",
-  "license": "MPL-2.0",
-  "dependencies": {
-    "express": "^4.14.0",
-    "nunjucks": "^3.0.0",
-    "path": "^0.12.7",
-    "serve-favicon": "^2.3.2"
-  },
-  "devDependencies": {
-    "nodemon": "^1.11.0"
-  }
+    "name": "traffic-cop-demo",
+    "version": "1.0.0",
+    "description": "Express app demonstrating usage of Traffic Cop.",
+    "main": "index.js",
+    "scripts": {
+        "start": "nodemon src/index.js"
+    },
+    "author": "Mozilla",
+    "license": "MPL-2.0",
+    "dependencies": {
+        "express": "^4.14.0",
+        "nunjucks": "^3.0.0",
+        "path": "^0.12.7",
+        "serve-favicon": "^2.3.2"
+    },
+    "devDependencies": {
+        "nodemon": "^1.11.0"
+    }
 }

@@ -1,6 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
-* License, v. 2.0. If a copy of the MPL was not distributed with this
-* file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ */
 
 /*\
 |*|
@@ -18,7 +20,7 @@
 |*|
 |*|  Syntaxes:
 |*|
-|*|  * Mozilla.Cookies.setItem(name, value[, end[, path[, domain[, secure]]]])
+|*|  * Mozilla.Cookies.setItem(name, value[, end[, path[, domain[, secure[, samesite]]]]])
 |*|  * Mozilla.Cookies.getItem(name)
 |*|  * Mozilla.Cookies.removeItem(name[, path[, domain]])
 |*|  * Mozilla.Cookies.hasItem(name)
@@ -27,49 +29,115 @@
 \*/
 
 // create namespace
-if (typeof Mozilla === 'undefined') {
-    var Mozilla = {};
+if (typeof window.Mozilla === 'undefined') {
+    window.Mozilla = {};
 }
 
 Mozilla.Cookies = {
     getItem: function (sKey) {
-        if (!sKey) { return null; }
-        return decodeURIComponent(document.cookie.replace(new RegExp('(?:(?:^|.*;)\\s*' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=\\s*([^;]*).*$)|^.*$'), '$1')) || null;
+        'use strict';
+        if (!sKey) {
+            return null;
+        }
+        return (
+            decodeURIComponent(
+                document.cookie.replace(
+                    new RegExp(
+                        '(?:(?:^|.*;)\\s*' +
+                            encodeURIComponent(sKey).replace(
+                                /[-.+*]/g,
+                                '\\$&'
+                            ) +
+                            '\\s*\\=\\s*([^;]*).*$)|^.*$'
+                    ),
+                    '$1'
+                )
+            ) || null
+        );
     },
-    setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure) {
-        if (!sKey || /^(?:expires|max\-age|path|domain|secure)$/i.test(sKey)) { return false; }
+    setItem: function (sKey, sValue, vEnd, sPath, sDomain, bSecure, vSamesite) {
+        'use strict';
+        if (
+            !sKey ||
+            /^(?:expires|max-age|path|domain|secure|samesite)$/i.test(sKey)
+        ) {
+            return false;
+        }
         var sExpires = '';
         if (vEnd) {
             switch (vEnd.constructor) {
-            case Number:
-                sExpires = vEnd === Infinity ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT' : '; max-age=' + vEnd;
-                break;
-            case String:
-                sExpires = '; expires=' + vEnd;
-                break;
-            case Date:
-                sExpires = '; expires=' + vEnd.toUTCString();
-                break;
+                case Number:
+                    sExpires =
+                        vEnd === Infinity
+                            ? '; expires=Fri, 31 Dec 9999 23:59:59 GMT'
+                            : '; max-age=' + vEnd;
+                    break;
+                case String:
+                    sExpires = '; expires=' + vEnd;
+                    break;
+                case Date:
+                    sExpires = '; expires=' + vEnd.toUTCString();
+                    break;
             }
         }
-        document.cookie = encodeURIComponent(sKey) + '=' + encodeURIComponent(sValue) + sExpires + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '') + (bSecure ? '; secure' : '');
+
+        vSamesite = this.checkSameSite(vSamesite);
+
+        // setting the samesite attribute to 'none' requires the cookie to be 'secure'
+        if (vSamesite === 'none') {
+            bSecure = true;
+        }
+        document.cookie =
+            encodeURIComponent(sKey) +
+            '=' +
+            encodeURIComponent(sValue) +
+            sExpires +
+            (sDomain ? '; domain=' + sDomain : '') +
+            (sPath ? '; path=' + sPath : '') +
+            (bSecure ? '; secure' : '') +
+            (!vSamesite ? '' : '; samesite=' + vSamesite);
         return true;
     },
     removeItem: function (sKey, sPath, sDomain) {
-        if (!this.hasItem(sKey)) { return false; }
-        document.cookie = encodeURIComponent(sKey) + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' + (sDomain ? '; domain=' + sDomain : '') + (sPath ? '; path=' + sPath : '');
+        'use strict';
+        if (!this.hasItem(sKey)) {
+            return false;
+        }
+        document.cookie =
+            encodeURIComponent(sKey) +
+            '=; expires=Thu, 01 Jan 1970 00:00:00 GMT' +
+            (sDomain ? '; domain=' + sDomain : '') +
+            (sPath ? '; path=' + sPath : '');
         return true;
     },
     hasItem: function (sKey) {
-        if (!sKey) { return false; }
-        return (new RegExp('(?:^|;\\s*)' + encodeURIComponent(sKey).replace(/[\-\.\+\*]/g, '\\$&') + '\\s*\\=')).test(document.cookie);
+        'use strict';
+        if (!sKey) {
+            return false;
+        }
+        return new RegExp(
+            '(?:^|;\\s*)' +
+                encodeURIComponent(sKey).replace(/[-.+*]/g, '\\$&') +
+                '\\s*\\='
+        ).test(document.cookie);
     },
     keys: function () {
-        var aKeys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, '').split(/\s*(?:\=[^;]*)?;\s*/);
-        for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) { aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]); }
+        'use strict';
+        var aKeys = document.cookie
+            .replace(
+                // see issue 11338.
+                // eslint-disable-next-line no-useless-backreference
+                /((?:^|\s*;)[^=]+)(?=;|$)|^\s*|\s*(?:=[^;]*)?(?:\1|$)/g,
+                ''
+            )
+            .split(/\s*(?:=[^;]*)?;\s*/);
+        for (var nLen = aKeys.length, nIdx = 0; nIdx < nLen; nIdx++) {
+            aKeys[nIdx] = decodeURIComponent(aKeys[nIdx]);
+        }
         return aKeys;
     },
-    enabled: function() {
+    enabled: function () {
+        'use strict';
         /**
          * Cookies feature detect lifted from Modernizr
          * https://github.com/Modernizr/Modernizr/blob/master/feature-detects/cookies.js
@@ -86,14 +154,37 @@ Mozilla.Cookies = {
          */
         try {
             // Create cookie
-            document.cookie = 'cookietest=1';
+            document.cookie = 'cookietest=1; SameSite=Lax';
             var ret = document.cookie.indexOf('cookietest=') !== -1;
             // Delete cookie
-            document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
+            document.cookie =
+                'cookietest=1; SameSite=Lax; expires=Thu, 01-Jan-1970 00:00:01 GMT';
             return ret;
-        }
-        catch (e) {
+        } catch (e) {
             return false;
+        }
+    },
+
+    checkSameSite: function (vSamesite) {
+        'use strict';
+        /**
+         *  valid vSamesite values are 'lax', 'strict' and 'none' (case insensitive).
+         *  otherwise it will be 'lax'
+         */
+
+        if (!vSamesite) {
+            return null;
+        }
+        vSamesite = vSamesite.toString().toLowerCase();
+
+        if (
+            vSamesite === 'lax' ||
+            vSamesite === 'none' ||
+            vSamesite === 'strict'
+        ) {
+            return vSamesite;
+        } else {
+            return 'lax';
         }
     }
 };

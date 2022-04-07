@@ -4,14 +4,12 @@ Traffic Cop places visitors into A/B/x cohorts, and either performs a redirect o
 
 **Note that Traffic Cop supports percentages into the hundredths, but no smaller.**
 
-
 ## How it works
 
 After verifying the supplied configuration, Traffic Cop chooses a variation for the visitor in one of two ways:
 
 1. Checks the visitor's cookies to see if they were previously given a variation. If so, that same variation is used.
 2. If no previous variation exists, Traffic Cop generates a random number to choose a variation. If the supplied variations do not target 100% of visitors, the `novariation` value may be chosen. The chosen variation is written to a cookie for subsequent visits.
-
 
 ## Type A: Callback
 
@@ -42,10 +40,9 @@ var lou = new Mozilla.TrafficCop({
 lou.init();
 ```
 
-
 ## Type B: Redirect
 
-If the instance of Traffic Cop is *not* provided a `customCallback`, and if the chosen variation is *not* `novariation`, the visitor is redirected to the current URL with the chosen variation appended to the querystring.
+If the instance of Traffic Cop is _not_ provided a `customCallback`, and if the chosen variation is _not_ `novariation`, the visitor is redirected to the current URL with the chosen variation appended to the querystring.
 
 Any further functionality is handled by the application. (Usually loading different HTML/JS/CSS based on the query parameter.)
 
@@ -80,7 +77,6 @@ It is possible to have both types of experiments running on the same page for th
 
 Check out the demo for a live example of this setup.
 
-
 ## How a variation is chosen
 
 Variations are sorted in the order provided, and percentages are tallied to create tiers. Take the following config:
@@ -105,13 +101,12 @@ The implied tiers would be:
 
 If the random number generated was 12.6, the user would be redirected to `?v=a`. A value of 15.2 would send the user `?v=b`, 15.6 to `?v=c`, and anything above 40.31 would result in no redirect.
 
-
 ## Configuration
 
 Each instance of a Traffic Cop requires at least two pieces of configuration:
 
-- A string ID that is unique to other currently running tests (to avoid confusion when reading cookies)
-- A variations object that lists all variations along with the associated percent chance of being chosen
+-   A string ID that is unique to other currently running tests (to avoid confusion when reading cookies)
+-   A variations object that lists all variations along with the associated percent chance of being chosen
 
 An implementation for a redirect experiment might look like:
 
@@ -128,10 +123,9 @@ var eddie = new Mozilla.TrafficCop({
 eddie.init();
 ```
 
-In the above example, the string *experiment-new-headline* will be used as the cookie name to store the chosen variation.
+In the above example, the string _experiment-new-headline_ will be used as the cookie name to store the chosen variation.
 
 The test will have 3 variations and will target a total of 23.78% of visitors. There will also be a 76.22% chance that `novariation` is chosen.
-
 
 ### Optional Configuration
 
@@ -147,9 +141,9 @@ var lou = new Mozilla.TrafficCop({
     customCallback: someCallbackFunction,
     cookieExpires: 0, // lasts until user closes the window/tab
     variations: {
-        'a': 25,
-        'b': 25,
-        'c': 25
+        a: 25,
+        b: 25,
+        c: 25
     }
 });
 
@@ -158,7 +152,7 @@ lou.init();
 
 #### Maintaining referral sources
 
-One obstacle with client-side redirects is that the original referrer gets lost, which makes it difficult to know where your traffic is coming from. To remedy this, Traffic Cop by default sets a cookie just prior to redirecting the visitor that holds the original value of `document.referer`. This cookie is named *mozilla-traffic-cop-original-referrer* and contains the value of `document.referer`, or *direct* if `document.referer` is empty.
+One obstacle with client-side redirects is that the original referrer gets lost, which makes it difficult to know where your traffic is coming from. To remedy this, Traffic Cop by default sets a cookie just prior to redirecting the visitor that holds the original value of `document.referer`. This cookie is named _mozilla-traffic-cop-original-referrer_ and contains the value of `document.referer`, or _direct_ if `document.referer` is empty.
 
 If you don't need this cookie, simply pass `setReferrerCookie: false` in your configuration. By default, this cookie will be set.
 
@@ -177,9 +171,8 @@ var referrer = Mozilla.Cookies.getItem('mozilla-traffic-cop-original-referrer');
 //
 
 // now clear the cookie so we don't accidentally read it again
-Mozilla.Cookies.removeItem('mozilla-traffic-cop-original-referrer')
+Mozilla.Cookies.removeItem('mozilla-traffic-cop-original-referrer');
 ```
-
 
 ## Implementation
 
@@ -189,7 +182,6 @@ Traffic Cop requires three JavaScript files:
 2. `mozilla-traffic-cop.js`
 3. A custom `.js` file to configure and initialize an instance of Traffic Cop (and perhaps contain a callback function)
 
-
 ### Considerations
 
 1. To prevent search engines from indexing a variation URL, we recommend adding a `<link rel="canonical">` to the `<head>` of your experiment pages that points to the URL without any variation parameters. For example, all variations for `www.toohot.today/product` should have the following tag:
@@ -197,7 +189,7 @@ Traffic Cop requires three JavaScript files:
     `<link rel="canonical" href="http://www.toohot.today/product">`
 
 2. Concatenate and minify experiment-specific files before sending to production. This will reduce your file size by about **70%**!
-3. Respect your visitors' privacy settings and check their *doNotTrack*<sup>[1](#trafficcop-footnote1)</sup> status before putting them in an experiment.
+3. Respect your visitors' privacy settings and check their _doNotTrack_<sup>[1](#trafficcop-footnote1)</sup> status before putting them in an experiment.
 
 <br><br>
 
