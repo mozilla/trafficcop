@@ -4,6 +4,11 @@ module.exports = {
     entry: './src/mozilla-traffic-cop.js',
     output: {
         filename: 'index.js',
-        path: path.resolve(__dirname, 'dist')
+        path: path.resolve(__dirname, 'dist'),
+        clean: true,
+        library: {
+            name: 'mozillaTrafficCop',
+            type: 'umd'
+        }
     }
 };
