@@ -1,13 +1,17 @@
 const path = require('path');
 
 module.exports = {
-    entry: './src/mozilla-traffic-cop.js',
+    entry: {
+        trafficCop: './src/mozilla-traffic-cop.js',
+        cookieHelper: './src/mozilla-cookie-helper.js',
+        dntHelper: './src/mozilla-dnt-helper.js'
+    },
     output: {
-        filename: 'index.js',
+        filename: '[name]-bundle.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
         library: {
-            name: 'mozillaTrafficCop',
+            name: 'mozModules',
             type: 'umd'
         }
     }
