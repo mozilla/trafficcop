@@ -1,5 +1,7 @@
 # Traffic Cop
 
+# This project has been migrated to the MozMeao GitHub org, which can be found here: https://github.com/mozmeao/trafficcop/
+
 ## Simple, lightweight, developer-focused front-end A/B testing
 
 (If you want to skip the spiel and get straight to business, check out the [docs](./documentation.md).)
